@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("HELLO", fac.toString());
                 StringRequest stringRequest = request(url);
                 //Instantiate the RequestQueue and add the request to the queue
-                VolleyController.getInstance(getApplicationContext(), fac).addToRequestQueue(stringRequest);
             }
         });
     }
