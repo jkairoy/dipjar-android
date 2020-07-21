@@ -4,7 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class SwipeResponse {
 
-
+    @SerializedName("CardData")
+    public String CardData;
     @SerializedName("UserId")
     public String UserId;
     @SerializedName("FirstName")
@@ -20,9 +21,8 @@ public class SwipeResponse {
     @SerializedName("ResponseMessage")
     public String ResponseMessage;
 
-    public SwipeResponse(String UserId, String Password) {
-        this.UserId = UserId;
-        this.Password = Password;
+    public SwipeResponse(String CardData) {
+        this.CardData = CardData;
     }
 
     public String getUserId() {

@@ -7,21 +7,20 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
+import pojos.SwipeResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
+
+    APIInterface apiInterface;
+
     public String testCard() {
         StringBuilder text = new StringBuilder();
         try {
@@ -44,40 +43,36 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        apiInterface = APIClient.getClient().create(APIInterface.class);
+
         Button btn1 = findViewById(R.id.btn1);
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = "https://tx-stage.djsvc.net";
-                //Request a string response from the URL resource
-                SSLSocketFactory fac = new CrtSocketFactory().SocketFactory(getApplicationContext());
-                try {
-                    HttpsURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
-                    connection.setSSLSocketFactory(fac);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Log.i("HELLO", fac.toString());
-                StringRequest stringRequest = request(url);
-                //Instantiate the RequestQueue and add the request to the queue
-            }
-        });
-    }
-
-    public StringRequest request(String url) {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener() {
+//                //Request a string response from the URL resource
+//                SSLSocketFactory fac = new CrtSocketFactory().SocketFactory(getApplicationContext());
+//                try {
+//                    HttpsURLConnection connection = (HttpsURLConnection) new URL(url).openConnection();
+//                    connection.setSSLSocketFactory(fac);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                Log.i("HELLO", fac.toString());
+                final SwipeResponse swipe = new SwipeResponse(testCard());
+                Call<SwipeResponse> swipeCall = apiInterface.swipeCallback(swipe);
+                swipeCall.enqueue(new Callback<SwipeResponse>() {
                     @Override
-                    public void onResponse(Object response) {
-                        Log.i("res", response.toString());
+                    public void onResponse(Call<SwipeResponse> call, Response<SwipeResponse> response) {
+                        Log.i("OK", response.toString());
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i("err", error.toString());
+                    @Override
+                    public void onFailure(Call<SwipeResponse> call, Throwable t) {
+                        Log.i("OHNO", t.toString());
+                    }
+                });
             }
         });
-
-        return stringRequest;
     }
+
 }
