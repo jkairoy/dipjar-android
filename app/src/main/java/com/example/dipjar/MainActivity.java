@@ -12,15 +12,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.tls.HandshakeCertificates;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,25 +51,17 @@ public class MainActivity extends AppCompatActivity {
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                OkHttpClient client;
-                CertificateFactory certFactory = null;
-                X509Certificate cert = null;
-                InputStream certraw = getResources().openRawResource(R.raw.djca);
-                try {
-                    certFactory = CertificateFactory.getInstance("X.509");
-                    cert = (X509Certificate) certFactory.generateCertificate(certraw);
-                } catch (CertificateException e) {
-                    e.printStackTrace();
-                }
-                HandshakeCertificates certificates = new HandshakeCertificates.Builder()
-                        .addTrustedCertificate(cert).build();
-                client = new OkHttpClient.Builder()
-                        .sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager())
-                        .build();
+
                 Request request = new Request.Builder()
                         .url("https://tx-stage.djsvc.net")
                         .build();
 
+                OkHttpClient client = null;
+                try {
+                    client = new CustomTrust(getBaseContext()).getClient();
+                } catch (CertificateException e) {
+                    e.printStackTrace();
+                }
                 client.newCall(request).enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
